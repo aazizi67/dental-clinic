@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Calendar Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/verta@1.12.2/dist/verta.min.js"></script>
+</head>
+<body>
+    <h1>Calendar Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        // تابع برای دریافت اولین روز ماه (شنبه = 0, جمعه = 6)
+        function getFirstDayOfMonth(year, month) {
+            // استفاده از کتابخانه Verta برای محاسبه دقیق
+            try {
+                // اولین روز ماه شمسی
+                const firstDay = verta(year, month, 1);
+                // دریافت روز هفته (شنبه = 0, جمعه = 6)
+                // format('w') returns 0 for Saturday, 1 for Sunday, ..., 6 for Friday
+                return parseInt(firstDay.format('w'));
+            } catch (e) {
+                console.error('Error calculating first day of month:', e);
+                // در صورت بروز خطا، مقدار تقریبی برگردانده می‌شود
+                return (month + year) % 7;
+            }
+        }
+        
+        // Test the function
+        const results = document.getElementById('results');
+        
+        // Test for Shahrivar 1404 (current month)
+        const currentYear = 1404;
+        const currentMonth = 6; // Shahrivar
+        const firstDayCurrent = getFirstDayOfMonth(currentYear, currentMonth);
+        
+        // Test for Shahrivar 1403 (previous year)
+        const previousYear = 1403;
+        const firstDayPrevious = getFirstDayOfMonth(previousYear, currentMonth);
+        
+        results.innerHTML = `
+            <p>First day of Shahrivar 1404: Index ${firstDayCurrent}</p>
+            <p>First day of Shahrivar 1403: Index ${firstDayPrevious}</p>
+            <p>Today is Shahrivar 24, 1404: ${verta(1404, 6, 24).format('l')} (Index: ${verta(1404, 6, 24).format('w')})</p>
+        `;
+    </script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Calendar Debug</title>
+    <script src="https://cdn.jsdelivr.net/npm/verta@1.12.2/dist/verta.min.js"></script>
+    <style>
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .calendar-day {
+            min-height: 120px;
+            border-radius: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            border: 1px solid #e9ecef;
+        }
+        
+        .calendar-day.other-month {
+            background: #f0f0f0;
+            color: #adb5bd;
+        }
+        
+        .calendar-day.today {
+            background: #d1ecf1;
+            border-color: #0dcaf0;
+        }
+        
+        .calendar-day.holiday {
+            background: #fff3f3;
+            border-color: #dc3545;
+        }
+        
+        .calendar-day-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .calendar-day.holiday .calendar-day-number {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calendar Debug</h1>
+    
+    <div class="row" id="calendar-header">
+        <div class="col text-center fw-bold">شنبه</div>
+        <div class="col text-center fw-bold">یک‌شنبه</div>
+        <div class="col text-center fw-bold">دوشنبه</div>
+        <div class="col text-center fw-bold">سه‌شنبه</div>
+        <div class="col text-center fw-bold">چهارشنبه</div>
+        <div class="col text-center fw-bold">پنج‌شنبه</div>
+        <div class="col text-center fw-bold">جمعه</div>
+    </div>
+    <hr>
+    <div class="calendar-grid" id="calendar-grid"></div>
+    
+    <script>
+        // تابع برای تبدیل اعداد انگلیسی به فارسی
+        function toPersianDigits(input) {
+            const persianDigitMap = {
+                '0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴',
+                '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹'
+            };
+            return String(input).replace(/[0-9]/g, d => persianDigitMap[d]);
+        }
+        
+        // تابع برای دریافت اولین روز ماه (شنبه = 0, جمعه = 6)
+        function getFirstDayOfMonth(year, month) {
+            // استفاده از کتابخانه Verta برای محاسبه دقیق
+            try {
+                // اولین روز ماه شمسی
+                const firstDay = verta(year, month, 1);
+                // دریافت روز هفته (شنبه = 0, جمعه = 6)
+                // format('w') returns 0 for Saturday, 1 for Sunday, ..., 6 for Friday
+                return parseInt(firstDay.format('w'));
+            } catch (e) {
+                console.error('Error calculating first day of month:', e);
+                // در صورت بروز خطا، مقدار تقریبی برگردانده می‌شود
+                return (month + year) % 7;
+            }
+        }
+        
+        // تابع برای دریافت تعداد روزهای ماه
+        function getDaysInMonth(year, month) {
+            // تعداد روزهای هر ماه در تقویم شمسی
+            const daysInMonth = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+            
+            // برای سال کبیسه ماه اسفند 30 روز دارد
+            if (isLeapYear(year) && month === 12) {
+                return 30;
+            }
+            
+            return daysInMonth[month - 1];
+        }
+        
+        // تابع برای بررسی سال کبیسه
+        function isLeapYear(year) {
+            // الگوریتم ساده برای تشخیص سال کبیسه شمسی
+            return (year % 33 % 4 === 1);
+        }
+        
+        // تابع برای نمایش تقویم
+        function renderCalendar(year, month) {
+            const calendarGrid = document.getElementById('calendar-grid');
+            
+            // پاک کردن تقویم قبلی
+            calendarGrid.innerHTML = '';
+            
+            // دریافت اولین روز ماه و تعداد روزها
+            const firstDay = getFirstDayOfMonth(year, month);
+            const daysInMonth = getDaysInMonth(year, month);
+            
+            console.log(`First day of ${year}/${month}: ${firstDay}`);
+            console.log(`Days in month: ${daysInMonth}`);
+            
+            // دریافت ماه قبلی برای نمایش روزهای اول ماه
+            let prevMonth = month - 1;
+            let prevYear = year;
+            if (prevMonth < 1) {
+                prevMonth = 12;
+                prevYear--;
+            }
+            const daysInPrevMonth = getDaysInMonth(prevYear, prevMonth);
+            
+            // ایجاد آرایه برای نگهداری تمام روزهای تقویم (42 روز برای 6 هفته)
+            const calendarDays = Array(42).fill(null);
+            
+            // پر کردن روزهای ماه قبلی
+            for (let i = 0; i < firstDay; i++) {
+                const day = daysInPrevMonth - firstDay + i + 1;
+                calendarDays[i] = { day, month: prevMonth, year: prevYear, isOtherMonth: true };
+            }
+            
+            // پر کردن روزهای ماه جاری
+            for (let day = 1; day <= daysInMonth; day++) {
+                const index = firstDay + day - 1;
+                calendarDays[index] = { day, month: month, year: year, isOtherMonth: false, isToday: false };
+            }
+            
+            // پر کردن روزهای ماه بعدی
+            let nextMonth = month + 1;
+            let nextYear = year;
+            if (nextMonth > 12) {
+                nextMonth = 1;
+                nextYear++;
+            }
+            
+            const totalCells = 42;
+            const remainingCells = Math.max(0, totalCells - firstDay - daysInMonth);
+            for (let day = 1; day <= remainingCells; day++) {
+                const index = firstDay + daysInMonth + day - 1;
+                calendarDays[index] = { day, month: nextMonth, year: nextYear, isOtherMonth: true };
+            }
+            
+            // ایجاد عناصر برای هر روز و اضافه کردن به تقویم
+            for (let i = 0; i < calendarDays.length; i++) {
+                const dayInfo = calendarDays[i];
+                if (dayInfo) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    
+                    if (dayInfo.isOtherMonth) {
+                        dayElement.classList.add('other-month');
+                    }
+                    
+                    // اضافه کردن شماره روز
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = 'calendar-day-number';
+                    dayNumber.textContent = toPersianDigits(dayInfo.day);
+                    dayElement.appendChild(dayNumber);
+                    
+                    calendarGrid.appendChild(dayElement);
+                } else {
+                    // ایجاد یک عنصر خالی برای روزهای بدون داده
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'calendar-day';
+                    calendarGrid.appendChild(emptyDay);
+                }
+            }
+        }
+        
+        // Test for Shahrivar 1404
+        renderCalendar(1404, 6);
+    </script>
+</body>
+</html>

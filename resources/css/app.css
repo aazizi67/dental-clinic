@@ -1,0 +1,275 @@
+/* سیستم مدیریت مطب دندانپزشکی - استایل‌های سفارشی */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* متغیرهای CSS برای رنگ‌ها */
+:root {
+  --primary-color: #3B82F6;
+  --primary-dark: #2563EB;
+  --primary-light: #EFF6FF;
+  --secondary-color: #64748B;
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --danger-color: #EF4444;
+  --surface-color: #FFFFFF;
+  --background-color: #F8FAFC;
+  --border-color: #E2E8F0;
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+}
+
+/* انیمیشن‌های نرم */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* بهبود طراحی کلی */
+body {
+  font-family: 'Vazirmatn', 'Inter', sans-serif;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* بهبود نوار بالا */
+.navbar {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.navbar-brand {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+/* بهبود sidebar */
+.sidebar {
+  background: var(--surface-color);
+  border-left: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-pills .nav-link {
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 6px;
+  padding: 14px 18px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-pills .nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-light), rgba(59, 130, 246, 0.1));
+  transition: width 0.3s ease;
+  z-index: -1;
+}
+
+.nav-pills .nav-link:hover::before {
+  width: 100%;
+}
+
+.nav-pills .nav-link:hover {
+  color: var(--primary-color);
+  transform: translateX(-3px);
+}
+
+.nav-pills .nav-link.active {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+/* بهبود کارت‌ها */
+.card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  background: var(--surface-color);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #FAFBFC, #F8FAFC);
+  border-bottom: 1px solid var(--border-color);
+  border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+  padding: 1.5rem;
+}
+
+/* بهبود دکمه‌ها */
+.btn {
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  padding: 10px 20px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline-primary {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+/* بهبود جداول */
+.table {
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+}
+
+.table thead th {
+  background: linear-gradient(135deg, #F8FAFC, #F1F5F9);
+  border-bottom: 2px solid var(--border-color);
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 1rem;
+}
+
+.table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(59, 130, 246, 0.02);
+  transform: scale(1.002);
+}
+
+/* بهبود فرم‌ها */
+.form-control, .form-select {
+  border-radius: var(--border-radius-sm);
+  border: 2px solid var(--border-color);
+  transition: all 0.2s ease;
+  padding: 12px 16px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+/* بهبود alert ها */
+.alert {
+  border-radius: var(--border-radius);
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.alert-success {
+  background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+  color: #065F46;
+}
+
+.alert-danger {
+  background: linear-gradient(135deg, #FEF2F2, #FECACA);
+  color: #991B1B;
+}
+
+/* استایل‌های آماری در داشبورد */
+.stats-card {
+  background: linear-gradient(135deg, var(--surface-color), #FAFBFC);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+}
+
+.stats-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* انیمیشن loading */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.loading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* بهبود responsive */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+  
+  .sidebar.show {
+    left: 0;
+  }
+}
+
+/* اضافه کردن استایل برای scroll bar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
+}

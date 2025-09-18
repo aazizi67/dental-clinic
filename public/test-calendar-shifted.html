@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Shifted Calendar Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/verta@1.12.2/dist/verta.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            padding: 20px;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .calendar-day {
+            min-height: 80px;
+            border-radius: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            text-align: center;
+        }
+        
+        .calendar-day.other-month {
+            background: #f0f0f0;
+            color: #adb5bd;
+        }
+        
+        .calendar-day-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .button-group {
+            margin: 10px 0;
+        }
+        
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        
+        .shifted-calendar .calendar-day.shifted-holiday {
+            background: #fff3f3;
+            border-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>تست تقویم با جابجایی روزها</h1>
+    
+    <div class="test-section">
+        <h2>تست تاریخ‌های شمسی با جابجایی ۳ روزه</h2>
+        <div class="button-group">
+            <button onclick="testShahrivarFirstShifted()">تست ۱ شهریور ۱۴۰۴ (جابجایی‌شده)</button>
+            <button onclick="testShahrivar24Shifted()">تست ۲۴ شهریور ۱۴۰۴ (جابجایی‌شده)</button>
+        </div>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>تقویم ماه شهریور ۱۴۰۴ (جابجایی‌شده)</h2>
+        <div class="button-group">
+            <button onclick="renderShiftedShahrivarCalendar()">نمایش تقویم شهریور ۱۴۰۴ (جابجایی‌شده)</button>
+        </div>
+        <div class="calendar-header">
+            <div>شنبه</div>
+            <div>یک‌شنبه</div>
+            <div>دوشنبه</div>
+            <div>سه‌شنبه</div>
+            <div>چهارشنبه</div>
+            <div>پنج‌شنبه</div>
+            <div>جمعه</div>
+        </div>
+        <div class="calendar-grid shifted-calendar" id="shifted-calendar-grid"></div>
+    </div>
+
+    <script>
+        // تابع برای تبدیل اعداد انگلیسی به فارسی
+        function toPersianDigits(input) {
+            const persianDigitMap = {
+                '0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴',
+                '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹'
+            };
+            return String(input).replace(/[0-9]/g, d => persianDigitMap[d]);
+        }
+
+        // تابع برای دریافت اولین روز ماه با جابجایی ۳ روزه (شنبه = 0, جمعه = 6)
+        function getFirstDayOfMonthShifted(year, month) {
+            try {
+                const firstDay = verta(year, month, 1);
+                let dayIndex = parseInt(firstDay.format('w'));
+                // Shift days by 3 positions
+                dayIndex = (dayIndex + 3) % 7;
+                return dayIndex;
+            } catch (e) {
+                console.error('Error calculating first day of month:', e);
+                return (month + year) % 7;
+            }
+        }
+
+        // تابع برای دریافت تعداد روزهای ماه
+        function getDaysInMonth(year, month) {
+            const daysInMonth = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+            
+            if (isLeapYear(year) && month === 12) {
+                return 30;
+            }
+            
+            return daysInMonth[month - 1];
+        }
+
+        // تابع برای بررسی سال کبیسه
+        function isLeapYear(year) {
+            return (year % 33 % 4 === 1);
+        }
+
+        // تابع تست برای ۱ شهریور ۱۴۰۴ با جابجایی
+        function testShahrivarFirstShifted() {
+            const results = document.getElementById('test-results');
+            try {
+                const testDate = verta(1404, 6, 1); // شهریور = 6
+                const dayOfWeek = testDate.format('l'); // نام روز هفته
+                const dayOfWeekIndex = parseInt(testDate.format('w')); // اندیس روز هفته
+                const firstDayOfMonth = getFirstDayOfMonthShifted(1404, 6);
+                
+                results.innerHTML = `
+                    <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                        <h3>نتایج تست ۱ شهریور ۱۴۰۴ (جابجایی‌شده):</h3>
+                        <p><strong>تاریخ:</strong> ۱ شهریور ۱۴۰۴</p>
+                        <p><strong>روز هفته واقعی:</strong> ${dayOfWeek} (اندیس: ${dayOfWeekIndex})</p>
+                        <p><strong>روز هفته جابجایی‌شده:</strong> اندیس ${firstDayOfMonth} (${getPersianDayName(firstDayOfMonth)})</p>
+                        <p><strong>موقعیت ۱ شهریور در تقویم جابجایی‌شده:</strong> خانه شماره ${firstDayOfMonth + 1}</p>
+                    </div>
+                `;
+            } catch (e) {
+                results.innerHTML = `<div style="background: #ffebee; padding: 15px; border-radius: 8px;">خطا: ${e.message}</div>`;
+            }
+        }
+
+        // تابع تست برای ۲۴ شهریور ۱۴۰۴ با جابجایی
+        function testShahrivar24Shifted() {
+            const results = document.getElementById('test-results');
+            try {
+                const testDate = verta(1404, 6, 24); // شهریور = 6
+                const dayOfWeek = testDate.format('l'); // نام روز هفته
+                const dayOfWeekIndex = parseInt(testDate.format('w')); // اندیس روز هفته
+                const firstDayOfMonth = getFirstDayOfMonthShifted(1404, 6);
+                
+                // Calculate shifted position
+                const shiftedPosition = firstDayOfMonth + 24;
+                const shiftedDayIndex = (dayOfWeekIndex + 3) % 7;
+                
+                results.innerHTML = `
+                    <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                        <h3>نتایج تست ۲۴ شهریور ۱۴۰۴ (جابجایی‌شده):</h3>
+                        <p><strong>تاریخ:</strong> ۲۴ شهریور ۱۴۰۴</p>
+                        <p><strong>روز هفته واقعی:</strong> ${dayOfWeek} (اندیس: ${dayOfWeekIndex})</p>
+                        <p><strong>روز هفته جابجایی‌شده:</strong> اندیس ${shiftedDayIndex} (${getPersianDayName(shiftedDayIndex)})</p>
+                        <p><strong>اولین روز ماه شهریور (جابجایی‌شده):</strong> اندیس ${firstDayOfMonth} (${getPersianDayName(firstDayOfMonth)})</p>
+                        <p><strong>موقعیت ۲۴ شهریور در تقویم جابجایی‌شده:</strong> خانه شماره ${shiftedPosition} (سطر ${Math.floor((shiftedPosition - 1) / 7) + 1}, ستون ${((shiftedPosition - 1) % 7) + 1})</p>
+                    </div>
+                `;
+            } catch (e) {
+                results.innerHTML = `<div style="background: #ffebee; padding: 15px; border-radius: 8px;">خطا: ${e.message}</div>`;
+            }
+        }
+
+        // تابع برای دریافت نام فارسی روز
+        function getPersianDayName(index) {
+            const days = ['شنبه', 'یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'];
+            return days[index];
+        }
+
+        // تابع برای دریافت نام فارسی ماه
+        function getPersianMonthName(index) {
+            const months = [
+                'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+                'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+            ];
+            return months[index - 1];
+        }
+
+        // تابع برای نمایش تقویم شهریور ۱۴۰۴ با جابجایی
+        function renderShiftedShahrivarCalendar() {
+            const calendarGrid = document.getElementById('shifted-calendar-grid');
+            calendarGrid.innerHTML = '';
+            
+            const year = 1404;
+            const month = 6; // شهریور
+            
+            // دریافت اولین روز ماه با جابجایی
+            const firstDay = getFirstDayOfMonthShifted(year, month);
+            const daysInMonth = getDaysInMonth(year, month);
+            
+            // ایجاد آرایه برای تمام روزهای تقویم
+            const calendarDays = Array(42).fill(null);
+            
+            // پر کردن روزهای ماه قبلی
+            const prevMonth = month - 1;
+            const prevYear = year;
+            const daysInPrevMonth = getDaysInMonth(prevYear, prevMonth);
+            
+            for (let i = 0; i < firstDay; i++) {
+                const day = daysInPrevMonth - firstDay + i + 1;
+                calendarDays[i] = { day, month: prevMonth, year: prevYear, isOtherMonth: true };
+            }
+            
+            // پر کردن روزهای ماه جاری
+            for (let day = 1; day <= daysInMonth; day++) {
+                const index = firstDay + day - 1;
+                calendarDays[index] = { day, month: month, year: year, isOtherMonth: false };
+            }
+            
+            // پر کردن روزهای ماه بعدی
+            const nextMonth = month + 1;
+            const nextYear = year;
+            const totalCells = 42;
+            const remainingCells = Math.max(0, totalCells - firstDay - daysInMonth);
+            
+            for (let day = 1; day <= remainingCells; day++) {
+                const index = firstDay + daysInMonth + day - 1;
+                calendarDays[index] = { day, month: nextMonth, year: nextYear, isOtherMonth: true };
+            }
+            
+            // ایجاد عناصر برای هر روز
+            for (let i = 0; i < calendarDays.length; i++) {
+                const dayInfo = calendarDays[i];
+                if (dayInfo) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    
+                    if (dayInfo.isOtherMonth) {
+                        dayElement.classList.add('other-month');
+                    }
+                    
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = 'calendar-day-number';
+                    dayNumber.textContent = toPersianDigits(dayInfo.day);
+                    dayElement.appendChild(dayNumber);
+                    
+                    // اضافه کردن نام روز برای روزهای ماه جاری
+                    if (!dayInfo.isOtherMonth) {
+                        try {
+                            const vertaDay = verta(year, month, dayInfo.day);
+                            const dayOfWeek = vertaDay.format('l');
+                            const dayOfWeekIndex = parseInt(vertaDay.format('w'));
+                            // Calculate shifted day index
+                            const shiftedDayIndex = (dayOfWeekIndex + 3) % 7;
+                            const shiftedDayName = getPersianDayName(shiftedDayIndex);
+                            
+                            const dayName = document.createElement('div');
+                            dayName.style.fontSize = '0.8rem';
+                            dayName.style.color = '#666';
+                            dayName.textContent = shiftedDayName;
+                            dayElement.appendChild(dayName);
+                            
+                            // هایلایت کردن ۱ شهریور
+                            if (dayInfo.day === 1) {
+                                dayElement.style.backgroundColor = '#fff3cd';
+                                dayElement.style.borderColor = '#ffc107';
+                            }
+                            
+                            // هایلایت کردن ۲۴ شهریور
+                            if (dayInfo.day === 24) {
+                                dayElement.style.backgroundColor = '#f8d7da';
+                                dayElement.style.borderColor = '#dc3545';
+                            }
+                            
+                            // Mark Fridays (shifted)
+                            if (shiftedDayIndex === 6) { // جمعه در تقویم جابجایی‌شده
+                                dayElement.classList.add('shifted-holiday');
+                            }
+                        } catch (e) {
+                            console.error('Error creating day element:', e);
+                        }
+                    }
+                    
+                    calendarGrid.appendChild(dayElement);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
